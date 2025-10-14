@@ -3,6 +3,8 @@ from __future__ import annotations
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import JSONResponse
 
+from server.logging_config import logger
+
 router = APIRouter(prefix="/composio", tags=["composio"])
 
 @router.post("/callback")
@@ -10,6 +12,7 @@ router = APIRouter(prefix="/composio", tags=["composio"])
 async def composio_callback(payload: Request) -> JSONResponse:
     try:
         payload = await payload.json()
+        logger.info("Received callback from Composio:", payload)
         
         # Log or inspect the payload for debugging
         print("Received callback from Composio:", payload)
@@ -22,9 +25,11 @@ async def composio_callback(payload: Request) -> JSONResponse:
         if event_type == "ACTION_COMPLETED":
             # handle_action_completed(data)
             print("Action completed:", data)
+            logger.info("Action completed:", data)
         elif event_type == "ERROR":
             # handle_action_error(data)
             print("Error:", data)
+            logger.error("Error:", data)
         else:
             print("Unknown event type:", event_type)
 
