@@ -30,6 +30,14 @@ _TOOL_SCHEMA: Dict[str, Any] = {
                         "coordination, or contains critical security information (e.g. OTPs)."
                     ),
                 },
+                "isHotelBooking": {
+                    "type": "boolean",
+                    "description": (
+                        "Set to true only when the email contains details of a hotel booking "
+                        "confirmation with details such as hotel name, booking reference, check-in "
+                        "and check-out dates, and room type etc"
+                    ),
+                },
                 "summary": {
                     "type": "string",
                     "description": (
@@ -38,7 +46,7 @@ _TOOL_SCHEMA: Dict[str, Any] = {
                     ),
                 },
             },
-            "required": ["important"],
+            "required": ["important", "isHotelBooking"],
             "additionalProperties": False,
         },
     },
@@ -77,7 +85,7 @@ def _format_email_payload(email: ProcessedEmail) -> str:
     )
 
 
-async def classify_email_importance(email: ProcessedEmail) -> Optional[str]:
+async def classify_email_importance(email: ProcessedEmail) -> tuple[Optional[str], bool]:
     """Return summary text when email should be surfaced; otherwise None."""
 
     settings = get_settings()
@@ -86,7 +94,7 @@ async def classify_email_importance(email: ProcessedEmail) -> Optional[str]:
 
     if not api_key:
         logger.warning("Skipping importance check; OpenRouter API key missing")
-        return None
+        return None, False
 
     user_payload = _format_email_payload(email)
     messages = [{"role": "user", "content": user_payload}]
@@ -104,13 +112,13 @@ async def classify_email_importance(email: ProcessedEmail) -> Optional[str]:
             "Importance classification failed",
             extra={"message_id": email.id, "error": str(exc)},
         )
-        return None
+        return None, False
     except Exception as exc:  # pragma: no cover - defensive
         logger.exception(
             "Unexpected error during importance classification",
             extra={"message_id": email.id},
         )
-        return None
+        return None, False
 
     choice = (response.get("choices") or [{}])[0]
     message = choice.get("message") or {}
@@ -128,28 +136,29 @@ async def classify_email_importance(email: ProcessedEmail) -> Optional[str]:
                 "Importance tool returned invalid arguments",
                 extra={"message_id": email.id},
             )
-            return None
+            return None, False
 
         important = bool(arguments.get("important"))
         summary = arguments.get("summary")
+        isHotelBooking = bool(arguments.get("isHotelBooking"))
 
         if not important:
-            return None
+            return None, False
 
         if not isinstance(summary, str) or not summary.strip():
             logger.warning(
                 "Importance tool marked email important without summary",
                 extra={"message_id": email.id},
             )
-            return None
+            return None, False
 
-        return summary.strip()
+        return summary.strip(), isHotelBooking
 
     logger.debug(
         "Importance classification produced no tool call",
         extra={"message_id": email.id},
     )
-    return None
+    return None, False
 
 
 def _coerce_arguments(raw: Any) -> Optional[Dict[str, Any]]:

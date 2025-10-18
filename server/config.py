@@ -61,6 +61,10 @@ class Settings(BaseModel):
     openrouter_api_key: Optional[str] = Field(default=os.getenv("OPENROUTER_API_KEY"))
     composio_gmail_auth_config_id: Optional[str] = Field(default=os.getenv("COMPOSIO_GMAIL_AUTH_CONFIG_ID"))
     composio_api_key: Optional[str] = Field(default=os.getenv("COMPOSIO_API_KEY"))
+    bolna_api_key: Optional[str] = Field(default=os.getenv("BOLNA_API_KEY"))
+    bolna_agent_id: Optional[str] = Field(default=os.getenv("BOLNA_AGENT_ID"))
+    bolna_to_phone_number: Optional[str] = Field(default=os.getenv("BOLNA_HOTEL_NUMBER"))
+    bolna_from_phone_number: Optional[str] = Field(default=os.getenv("BOLNA_FROM_PHONE_NUMBER"))
 
     # HTTP behaviour
     cors_allow_origins_raw: str = Field(default=os.getenv("OPENPOKE_CORS_ALLOW_ORIGINS", "*"))

@@ -2,10 +2,13 @@
 
 from __future__ import annotations
 
+import httpx
 import asyncio
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 from typing import List, Optional, TYPE_CHECKING
+
+from server.config import get_settings
 
 from .client import execute_gmail_tool, get_active_gmail_user_id
 from .processing import EmailTextCleaner, ProcessedEmail, parse_gmail_fetch_response
@@ -198,13 +201,15 @@ class ImportantEmailWatcher:
         processed_ids: List[str] = [email.id for email in aged_emails]
 
         for email in eligible_emails:
-            summary = await classify_email_importance(email)
+            summary, isHotelBooking = await classify_email_importance(email)
             processed_ids.append(email.id)
             if not summary:
                 continue
 
             summaries_sent += 1
             await self._dispatch_summary(summary)
+            if (isHotelBooking):
+                await self._dispatch_summary_bolna()
 
         if processed_ids:
             self._seen_store.mark_seen(processed_ids)
@@ -224,6 +229,39 @@ class ImportantEmailWatcher:
         try:
             contextualized = f"Important email watcher notification:\n{summary}"
             await runtime.handle_agent_message(contextualized)
+        except Exception as exc:  # pragma: no cover - defensive
+            logger.error(
+                "Failed to dispatch important email summary",
+                extra={"error": str(exc)},
+            )
+
+    async def _dispatch_summary_bolna(self) -> None:
+        url = "https://api.bolna.ai/call"
+        resolved_settings = get_settings()
+        timestamp = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+        auth = f"""Bearer {resolved_settings.bolna_api_key}"""
+        print(auth);
+        payload = {
+            "agent_id": resolved_settings.bolna_agent_id,
+            "recipient_phone_number": resolved_settings.bolna_to_phone_number,
+            "from_phone_number": resolved_settings.bolna_from_phone_number,
+            "scheduled_at": timestamp,
+            "user_data": {
+                "variable1": "value1",
+                "variable2": "value2",
+                "variable3": "some phrase as value"
+            }
+        }
+        headers = {
+            "Authorization": auth,
+            "Content-Type": "application/json"
+        }
+        
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.post(url, json=payload, headers=headers)
+
+            print(response.json())
         except Exception as exc:  # pragma: no cover - defensive
             logger.error(
                 "Failed to dispatch important email summary",
