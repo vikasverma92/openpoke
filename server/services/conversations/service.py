@@ -74,6 +74,9 @@ class ConversationService:
         updated = self._store.update(voice_agent_id, voice_execution_id, fields)
         return self._store.fetch_one(conversation_id) if updated else existing
 
+    def get_conversation(self, conversation_id: int) -> Optional[ConversationRecord]:
+        return self._store.fetch_one(conversation_id)
+
     def mark_as_completed(self, voice_agent_id: str, *, voice_execution_id: str) -> None:
         self._store.update(
             voice_agent_id,
