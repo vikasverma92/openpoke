@@ -51,5 +51,5 @@ async def get_conversation(conversation_id: int) -> JSONResponse:
 @router.post("/callback")
 # callback endpoint for voice agents
 async def conversation_callback(payload: Dict[str, Any]) -> JSONResponse:
-    return handle_callback(payload)
+    return await handle_callback(payload)
 
