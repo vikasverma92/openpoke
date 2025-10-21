@@ -34,7 +34,7 @@ async def create_conversation(payload: ConversationCreatePayload) -> JSONRespons
 
 
 @router.get("/get/{conversation_id}")
-# Check the current Gmail connection status and user information
+# Get conversation by id
 async def get_conversation(conversation_id: int) -> JSONResponse:
     conversation_service = get_conversation_service()
     conversation = conversation_service.get_conversation(conversation_id=conversation_id)
@@ -42,5 +42,16 @@ async def get_conversation(conversation_id: int) -> JSONResponse:
         {
             "ok": True,
             "conversation": conversation.model_dump(),
+        }
+    )
+
+
+@router.post("/callback")
+# callback endpoint for voice agents
+async def get_conversation(payload) -> JSONResponse:
+    print("bolna callback", payload)
+    return JSONResponse(
+        {
+            "ok": True,
         }
     )
