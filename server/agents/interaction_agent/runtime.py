@@ -76,6 +76,7 @@ class InteractionAgentRuntime:
 
             logger.info("Processing user message through interaction agent")
             summary = await self._run_interaction_loop(system_prompt, messages)
+            logger.info("Couldn't complete user message through interaction agent")
 
             final_response = self._finalize_response(summary)
 
