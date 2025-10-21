@@ -1,5 +1,6 @@
 from __future__ import annotations
 import os
+from typing import Any, Dict
 
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
@@ -48,7 +49,7 @@ async def get_conversation(conversation_id: int) -> JSONResponse:
 
 @router.post("/callback")
 # callback endpoint for voice agents
-async def get_conversation(payload) -> JSONResponse:
+async def conversation_callback(payload: Dict[str, Any]) -> JSONResponse:
     print("bolna callback", payload)
     return JSONResponse(
         {
