@@ -1,7 +1,8 @@
-const serverBase = process.env.PY_SERVER_URL || 'http://localhost:8001';
-const historyPath = `${serverBase.replace(/\/$/, '')}/api/v1/chat/history`;
 
 async function forward(method: 'GET' | 'DELETE') {
+  const serverBase = process.env.NEXT_PUBLIC_PY_SERVER_URL || 'http://localhost:8001';
+  const historyPath = `${serverBase.replace(/\/$/, '')}/api/v1/chat/history`;
+
   try {
     const res = await fetch(historyPath, {
       method,

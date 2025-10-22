@@ -195,7 +195,8 @@ export default function SettingsModal({
       setConnectingGmail(true);
       setGmailStatusMessage('');
       const userId = ensureUserId();
-      const resp = await fetch('/api/gmail/connect', {
+      const serverBase = process.env.NEXT_PUBLIC_PY_SERVER_URL || 'http://localhost:8001';
+      const resp = await fetch(`${serverBase}/api/v1/gmail/connect`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId }),
@@ -244,10 +245,11 @@ export default function SettingsModal({
     try {
       setIsRefreshingGmail(true);
       setGmailStatusMessage('Refreshing Gmail status…');
-      const resp = await fetch('/api/gmail/status', {
+      const serverBase = process.env.NEXT_PUBLIC_PY_SERVER_URL || 'http://localhost:8001';
+      const resp = await fetch(`${serverBase}/api/v1/gmail/status`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, connectionRequestId }),
+        body: JSON.stringify({ user_id: userId, connection_request_id: connectionRequestId }),
       });
       const data = await resp.json().catch(() => ({}));
 
@@ -317,7 +319,8 @@ export default function SettingsModal({
       setGmailStatusMessage('Disconnecting Gmail…');
       const userId = readStoredUserId();
       const connectionRequestId = readStoredConnectionRequestId();
-      const resp = await fetch('/api/gmail/disconnect', {
+      const serverBase = process.env.NEXT_PUBLIC_PY_SERVER_URL || 'http://localhost:8001';
+      const resp = await fetch(`${serverBase}/api/v1/gmail/disconnect`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, connectionRequestId }),

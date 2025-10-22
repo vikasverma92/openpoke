@@ -8,7 +8,7 @@ export async function POST(req: Request) {
   const userId = body?.userId || '';
   const authConfigId = body?.authConfigId || '';
 
-  const serverBase = process.env.PY_SERVER_URL || 'http://localhost:8001';
+  const serverBase = process.env.NEXT_PUBLIC_PY_SERVER_URL || 'http://localhost:8001';
   const url = `${serverBase.replace(/\/$/, '')}/api/v1/gmail/connect`;
 
   try {

@@ -52,7 +52,8 @@ export default function Page() {
 
   const loadHistory = useCallback(async () => {
     try {
-      const res = await fetch('/api/chat/history', { cache: 'no-store' });
+      const serverBase = process.env.NEXT_PUBLIC_PY_SERVER_URL || 'http://localhost:8001';
+      const res = await fetch(`${serverBase}/api/v1/chat/history`, { cache: 'no-store' });
       if (!res.ok) return;
       const data = await res.json();
       setMessages(toBubbles(data));
@@ -74,9 +75,10 @@ export default function Page() {
       
       try {
         const browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        const serverBase = process.env.NEXT_PUBLIC_PY_SERVER_URL || 'http://localhost:8001';
         
         // Send to server
-        const response = await fetch('/api/timezone', {
+        const response = await fetch(`${serverBase}/api/v1/meta/timezone`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ timezone: browserTimezone }),
@@ -127,7 +129,8 @@ export default function Page() {
       });
 
       try {
-        const res = await fetch('/api/chat', {
+        const serverBase = process.env.NEXT_PUBLIC_PY_SERVER_URL || 'http://localhost:8001';
+        const res = await fetch(`${serverBase}/api/v1/chat/send`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -155,7 +158,8 @@ export default function Page() {
           pollAttempts++;
           
           try {
-            const res = await fetch('/api/chat/history', { cache: 'no-store' });
+            const serverBase = process.env.NEXT_PUBLIC_PY_SERVER_URL || 'http://localhost:8001';
+            const res = await fetch(`${serverBase}/api/v1/chat/history`, { cache: 'no-store' });
             if (res.ok) {
               const data = await res.json();
               const currentMessages = toBubbles(data);
@@ -195,7 +199,8 @@ export default function Page() {
 
   const handleClearHistory = useCallback(async () => {
     try {
-      const res = await fetch('/api/chat/history', { method: 'DELETE' });
+      const serverBase = process.env.NEXT_PUBLIC_PY_SERVER_URL || 'http://localhost:8001';
+      const res = await fetch(`${serverBase}v1/chat/history`, { method: 'DELETE' });
       if (!res.ok) {
         console.error('Failed to clear chat history', res.statusText);
         return;

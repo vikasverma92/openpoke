@@ -125,6 +125,9 @@ class ImportantEmailWatcher:
             "max_results": DEFAULT_MAX_RESULTS,
         }
 
+        #todo: remove this
+        print("arguments", arguments, composio_user_id, query)
+
         try:
             raw_result = execute_gmail_tool("GMAIL_FETCH_EMAILS", composio_user_id, arguments=arguments)
         except Exception as exc:
