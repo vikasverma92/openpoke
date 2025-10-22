@@ -199,7 +199,7 @@ export default function SettingsModal({
       const resp = await fetch(`${serverBase}/api/v1/gmail/connect`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId }),
+        body: JSON.stringify({ user_id: userId }),
       });
       const data = await resp.json().catch(() => ({}));
       if (!resp.ok || !data?.ok) {
@@ -323,7 +323,7 @@ export default function SettingsModal({
       const resp = await fetch(`${serverBase}/api/v1/gmail/disconnect`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, connectionRequestId }),
+        body: JSON.stringify({ user_id: userId, connection_request_id: connectionRequestId }),
       });
       const data = await resp.json().catch(() => ({}));
 
