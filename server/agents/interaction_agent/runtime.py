@@ -4,7 +4,7 @@ import json
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Set
 
-from .agent import build_system_prompt, build_system_prompt_standalone, prepare_message_with_history
+from .agent import build_system_prompt, prepare_message_with_history
 from .tools import ToolResult, get_tool_schemas, handle_tool_call
 from ...config import get_settings
 from ...services.conversation import get_conversation_log, get_working_memory_log
@@ -108,40 +108,6 @@ class InteractionAgentRuntime:
             system_prompt = build_system_prompt()
             messages = prepare_message_with_history(
                 agent_message, transcript_before, message_type="agent"
-            )
-
-            logger.info("Processing execution agent results")
-            summary = await self._run_interaction_loop(system_prompt, messages)
-
-            final_response = self._finalize_response(summary)
-
-            if final_response and not summary.user_messages:
-                self.conversation_log.record_reply(final_response)
-
-            return InteractionResult(
-                success=True,
-                response=final_response,
-                execution_agents_used=len(summary.execution_agents),
-            )
-
-        except Exception as exc:
-            logger.error("Interaction agent (agent message) failed", extra={"error": str(exc)})
-            return InteractionResult(
-                success=False,
-                response="",
-                error=str(exc),
-            )
-
-    # Handle incoming messages from execution agents and generate appropriate responses
-    async def handle_agent_message_standalone(self, agent_message: str) -> InteractionResult:
-        """Process a status update emitted by an execution agent."""
-
-        try:
-            self.conversation_log.record_agent_message(agent_message)
-
-            system_prompt = build_system_prompt_standalone()
-            messages = prepare_message_with_history(
-                agent_message, "", message_type="agent"
             )
 
             logger.info("Processing execution agent results")

@@ -9,13 +9,6 @@ from ...services.execution import get_agent_roster
 _prompt_path = Path(__file__).parent / "system_prompt.md"
 SYSTEM_PROMPT = _prompt_path.read_text(encoding="utf-8").strip()
 
-_standalone_prompt_path = Path(__file__).parent / "system_prompt_standalone.md"
-SYSTEM_PROMPT_STANDALONE = _standalone_prompt_path.read_text(encoding="utf-8").strip()
-
-def build_system_prompt_standalone() -> str:
-    """Return the static system prompt for the interaction agent standalone."""
-    return SYSTEM_PROMPT_STANDALONE
-
 
 # Load and return the pre-defined system prompt from markdown file
 def build_system_prompt() -> str:
